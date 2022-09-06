@@ -208,7 +208,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('nreal deneme app'),
+          title: const Text('nreal Log kayıt'),
         ),
         body: SingleChildScrollView(
           child: Column(
