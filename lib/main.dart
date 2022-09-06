@@ -18,6 +18,9 @@ void main() {
   ));
 }
 
+int? _groupValue = 0;
+var s;
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -35,10 +38,7 @@ class _MyAppState extends State<MyApp> {
   Vector3 _absoluteOrientation = Vector3.zero();
   Vector3 _absoluteOrientation2 = Vector3.zero();
   double? _screenOrientation = 0;
-
-  int? _groupValue = 0;
-  int sondeger = 200;
-  int kayitaktivite = 1;
+  bool kayitaktivite = false;
 
   @override
   void initState() {
@@ -99,8 +99,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-//textbox
-
   //oluşturulacak dosya yolu
   Future<String> get klasorYolu async {
     Directory? klasor = await getExternalStorageDirectory();
@@ -139,11 +137,11 @@ class _MyAppState extends State<MyApp> {
     return myDosya.writeAsString(yazilacakDeger);
   }
 
-  generateCsv() async {
+  generateCsv(bool k) async {
     List<List<dynamic>> dataRows = <List<dynamic>>[];
-    List<List<dynamic>> headerRows = <List<dynamic>>[];
-    List<dynamic> headerrow = [];
-    /*while (kayitaktivite) {
+    /*List<List<dynamic>> headerRows = <List<dynamic>>[];
+     List<dynamic> headerrow = [];
+      while (kayitaktivite) {
       List<String> headerdata = [
         "TIME",
         "accelometer.x",
@@ -168,58 +166,37 @@ class _MyAppState extends State<MyApp> {
       await file.writeAsString(csvData1);
     }*/
 
-    List<dynamic> row = [];
-    List<String> data = [
-      DateTime.now().toString(),
-      _accelerometer.x.toStringAsFixed(5),
-      _accelerometer.y.toStringAsFixed(5),
-      _accelerometer.z.toStringAsFixed(5),
-      _magnetometer.x.toStringAsFixed(5),
-      _magnetometer.y.toStringAsFixed(5),
-      _magnetometer.z.toStringAsFixed(5),
-      _gyroscope.x.toStringAsFixed(5),
-      _gyroscope.y.toStringAsFixed(5),
-      _gyroscope.z.toStringAsFixed(5)
-    ];
+    do {
+      List<dynamic> row = [];
+      List<String> data = [
+        DateTime.now().toString(),
+        _accelerometer.x.toStringAsFixed(5),
+        _accelerometer.y.toStringAsFixed(5),
+        _accelerometer.z.toStringAsFixed(5),
+        _magnetometer.x.toStringAsFixed(5),
+        _magnetometer.y.toStringAsFixed(5),
+        _magnetometer.z.toStringAsFixed(5),
+        _gyroscope.x.toStringAsFixed(5),
+        _gyroscope.y.toStringAsFixed(5),
+        _gyroscope.z.toStringAsFixed(5)
+      ];
 
-    row.add(data);
-    dataRows.add(row);
-    print("in" + kayitaktivite.toString());
+      row.add(data);
+      dataRows.add(row);
+      print("in" + kayitaktivite.toString());
 
-    /*List<List<String>> data = [
-      ["No.", "Name", "Roll No."],
-      [
-        "1",
-        _accelerometer.x.toStringAsFixed(4),
-        _accelerometer.y.toStringAsFixed(4),
-        _accelerometer.z.toStringAsFixed(4)
-      ],
-      [
-        "2",
-        _magnetometer.x.toStringAsFixed(4),
-        _magnetometer.y.toStringAsFixed(4),
-        _magnetometer.z.toStringAsFixed(4)
-      ],
-      [
-        "3",
-        _gyroscope.x.toStringAsFixed(4),
-        _gyroscope.y.toStringAsFixed(4),
-        _gyroscope.z.toStringAsFixed(4)
-      ]
-    ];*/
-
-    String csvData = const ListToCsvConverter().convert(dataRows);
-
-    print("converted");
-    Directory? klasor = await getExternalStorageDirectory();
-    print("folder opened");
-    String directory = klasor!.path.toString();
-    // Directory? directory = await getExternalStorageDirectory();
-    final path = "$directory/logger_nreal.csv";
-    print(path);
-    final File file = File(path);
-
-    await file.writeAsString(csvData);
+      String csvData = const ListToCsvConverter().convert(dataRows);
+      print("converted");
+      Directory? klasor = await getExternalStorageDirectory();
+      print("klasör" + klasor.toString());
+      String directory = klasor!.path.toString();
+      // Directory? directory = await getExternalStorageDirectory();
+      final path = "$directory/logger_nreal.csv";
+      print(path);
+      final File file = File(path);
+      s = file.openWrite();
+      await file.writeAsString(csvData);
+    } while (k == true);
   }
 
   ///
@@ -336,30 +313,23 @@ class _MyAppState extends State<MyApp> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      kayitaktivite = 1;
-                    });
-                    while (kayitaktivite != 0) {
-                      generateCsv();
-                    }
-
-                    //   dosyayaYaz("123");
-                    //   generateCsv();
+                    kayitaktivite = true;
+                    generateCsv(kayitaktivite);
+                    print("kayıt başlat" + kayitaktivite.toString());
                   },
                   child: const Text('kayıt başlat')),
               Text(kayitaktivite.toString()),
               ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      kayitaktivite = 0;
-                    });
-                    while (kayitaktivite == 0) {
-                      print("dg");
-                    }
-                    // generateCsv();
-                    //   dosyayaYaz("123");
+                    kayitaktivite = false;
+                    generateCsv(kayitaktivite);
                   },
                   child: const Text('kayıt durdur')),
+              ElevatedButton(
+                  onPressed: () {
+                    print(kayitaktivite.toString());
+                  },
+                  child: const Text('kayıt yolu gör')),
             ],
           ),
         ),
