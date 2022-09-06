@@ -1,6 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api, depend_on_referenced_packages, unnecessary_string_interpolations, prefer_final_fields, prefer_interpolation_to_compose_strings, avoid_print, await_only_futures
+// ignore_for_file: library_private_types_in_public_api, depend_on_referenced_packages, unnecessary_string_interpolations, prefer_final_fields, prefer_interpolation_to_compose_strings, avoid_print, await_only_futures, prefer_typing_uninitialized_variables
 
 import 'package:csv/csv.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
@@ -13,7 +14,6 @@ void main() {
   runApp(MaterialApp(
     routes: {
       '/': (context) => const MyApp(),
-      //  '/logger': (context) => DosyaIslem(),
     },
   ));
 }
@@ -39,6 +39,7 @@ class _MyAppState extends State<MyApp> {
   Vector3 _absoluteOrientation2 = Vector3.zero();
   double? _screenOrientation = 0;
   bool kayitaktivite = false;
+  bool _switchValue = true;
 
   @override
   void initState() {
@@ -85,6 +86,8 @@ class _MyAppState extends State<MyApp> {
         _screenOrientation = event.angle;
       });
     });
+
+    super.initState();
   }
 
   void setUpdateInterval(int? groupValue, int interval) {
@@ -138,7 +141,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   generateCsv(bool k) async {
-    List<List<dynamic>> dataRows = <List<dynamic>>[];
+    List<List> dataRows = <List>[];
     /*List<List<dynamic>> headerRows = <List<dynamic>>[];
      List<dynamic> headerrow = [];
       while (kayitaktivite) {
@@ -166,7 +169,15 @@ class _MyAppState extends State<MyApp> {
       await file.writeAsString(csvData1);
     }*/
 
-    do {
+    while (k == true) {
+      String csvData = const ListToCsvConverter().convert(dataRows);
+      Directory? klasor = await getExternalStorageDirectory();
+      print("klasör" + klasor.toString());
+      String directory = klasor!.path.toString();
+      final path = "$directory/logger_nreal.csv";
+      print(path);
+      final File file = File(path);
+      s = file.openWrite();
       List<dynamic> row = [];
       List<String> data = [
         DateTime.now().toString(),
@@ -180,26 +191,18 @@ class _MyAppState extends State<MyApp> {
         _gyroscope.y.toStringAsFixed(5),
         _gyroscope.z.toStringAsFixed(5)
       ];
-
       row.add(data);
       dataRows.add(row);
-      print("in" + kayitaktivite.toString());
-
-      String csvData = const ListToCsvConverter().convert(dataRows);
-      print("converted");
-      Directory? klasor = await getExternalStorageDirectory();
-      print("klasör" + klasor.toString());
-      String directory = klasor!.path.toString();
-      // Directory? directory = await getExternalStorageDirectory();
-      final path = "$directory/logger_nreal.csv";
-      print(path);
-      final File file = File(path);
-      s = file.openWrite();
+      print("in " + kayitaktivite.toString());
+      print("in " + k.toString());
       await file.writeAsString(csvData);
-    } while (k == true);
+      if (kayitaktivite == false) {
+        break;
+      }
+    }
   }
 
-  ///
+  /////////////////////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -330,6 +333,17 @@ class _MyAppState extends State<MyApp> {
                     print(kayitaktivite.toString());
                   },
                   child: const Text('kayıt yolu gör')),
+              CupertinoSwitch(
+                value: _switchValue,
+                onChanged: (kayitaktivite) {
+                  setState(() {
+                    generateCsv(kayitaktivite);
+
+                    print("VALUE : $kayitaktivite");
+                    _switchValue = kayitaktivite;
+                  });
+                },
+              ),
             ],
           ),
         ),
