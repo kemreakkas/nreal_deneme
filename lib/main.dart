@@ -20,6 +20,7 @@ void main() {
 
 int? _groupValue = 0;
 var s;
+String showdirectory = '';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -174,6 +175,7 @@ class _MyAppState extends State<MyApp> {
       Directory? klasor = await getExternalStorageDirectory();
       print("klasör" + klasor.toString());
       String directory = klasor!.path.toString();
+      showdirectory = directory;
       final path = "$directory/logger_nreal.csv";
       print(path);
       final File file = File(path);
@@ -330,10 +332,13 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('kayıt durdur')),
               ElevatedButton(
                   onPressed: () {
-                    print(kayitaktivite.toString());
+                    setState(() {
+                      print(kayitaktivite.toString());
+                    });
                   },
                   child: const Text('kayıt yolu gör')),
-              CupertinoSwitch(
+              Text(showdirectory + "/logger_nreal.csv")
+              /* CupertinoSwitch(
                 value: _switchValue,
                 onChanged: (kayitaktivite) {
                   setState(() {
@@ -343,7 +348,7 @@ class _MyAppState extends State<MyApp> {
                     _switchValue = kayitaktivite;
                   });
                 },
-              ),
+              ),*/
             ],
           ),
         ),
